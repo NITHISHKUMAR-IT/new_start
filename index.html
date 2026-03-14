@@ -976,6 +976,9 @@ function triggerCelebration() {
 /* ============================================================
    PAGE 12 — ICONS FIELD
 ============================================================ */
+/* ============================================================
+   PAGE 12 — ICONS FIELD WITH NO NO BUTTONS
+============================================================ */
 const iconSymbols = [
   '♥','★','✦','◆','●','▲','✿','❋','⬟','⬠',
   '⊕','⊗','⊙','◉','◈','◇','△','▽','✦','❖',
@@ -987,17 +990,59 @@ function buildIconsField() {
   const field = document.getElementById('iconsField');
   field.innerHTML = '';
 
-  const totalIcons  = 65;
+  const totalIcons  = 60;
   const yesRevealAt = Math.floor(totalIcons * 0.55);
   let removedCount  = 0;
 
+  /* --- NO NO Buttons --- */
+  function createNoBtn(id, leftPercent) {
+    const btn = document.createElement('button');
+    btn.id        = id;
+    btn.textContent = 'NO';
+    btn.style.cssText = `
+      position: absolute;
+      left: ${leftPercent}%;
+      top: 82%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      background: rgba(255,255,255,0.9);
+      color: #8a0040;
+      border: 2px solid #c0607a;
+      border-radius: 2rem;
+      padding: 0.5rem 1.6rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(160,0,80,0.2);
+      transition: transform 0.15s ease;
+      z-index: 50;
+    `;
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Jump to a random new position away from finger
+      const newLeft = 10 + Math.random() * 75;
+      const newTop  = 10 + Math.random() * 65;
+      btn.style.left      = newLeft + '%';
+      btn.style.top       = newTop  + '%';
+      btn.style.transform = 'translateX(-50%) scale(0.92)';
+      setTimeout(() => { btn.style.transform = 'translateX(-50%) scale(1)'; }, 150);
+    });
+    field.appendChild(btn);
+    return btn;
+  }
+
+  createNoBtn('noBtn1', 30);
+  createNoBtn('noBtn2', 65);
+
+  /* --- Scattered icons --- */
   for (let i = 0; i < totalIcons; i++) {
     const el = document.createElement('div');
-    el.className = 'icon-item';
+    el.className   = 'icon-item';
     el.textContent = iconSymbols[Math.floor(Math.random() * iconSymbols.length)];
-    el.style.left     = (5  + Math.random() * 88) + '%';
-    el.style.top      = (3  + Math.random() * 90) + '%';
-    el.style.fontSize = (1.1 + Math.random() * 1.2) + 'rem';
+    el.style.left     = (4  + Math.random() * 88) + '%';
+    el.style.top      = (2  + Math.random() * 78) + '%';
+    el.style.fontSize = (1.0 + Math.random() * 1.2) + 'rem';
     el.style.color    = `hsl(${300 + Math.random() * 60}, 60%, 55%)`;
     el.addEventListener('click', function() {
       if (el.classList.contains('gone')) return;
@@ -1008,11 +1053,11 @@ function buildIconsField() {
     field.appendChild(el);
   }
 
-  /* Hidden YES button */
+  /* --- Hidden YES button --- */
   const yes = document.createElement('div');
-  yes.className = 'icon-item yes-icon';
-  yes.id        = 'yesBtn';
-  yes.textContent = 'YES';
+  yes.className       = 'icon-item yes-icon';
+  yes.id              = 'yesBtn';
+  yes.textContent     = 'YES';
   yes.style.left      = '50%';
   yes.style.top       = '45%';
   yes.style.transform = 'translate(-50%,-50%)';
@@ -1022,11 +1067,15 @@ function buildIconsField() {
 
   function checkReveal() {
     if (removedCount >= yesRevealAt && yes.style.display === 'none') {
+      // Hide NO buttons when YES appears
+      const n1 = document.getElementById('noBtn1');
+      const n2 = document.getElementById('noBtn2');
+      if (n1) n1.style.display = 'none';
+      if (n2) n2.style.display = 'none';
       yes.style.display = 'block';
     }
   }
 }
-
 /* ============================================================
    FINAL SCREEN
 ============================================================ */
